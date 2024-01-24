@@ -1,5 +1,5 @@
 {
-  "name": "@tallyxyz/governor",
+  "name": "@tallyxyz/governor-factory",
   "description": "Hardhat-based template for developing Solidity smart contracts",
   "version": "1.0.0",
   "author": {
