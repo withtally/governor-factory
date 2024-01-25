@@ -30,7 +30,9 @@ describe("Lock", function () {
       // We don't use the fixture here because we want a different deployment
       const latestTime = await time.latest();
       const Lock = await ethers.getContractFactory("Lock");
-      await expect(Lock.deploy(latestTime, { value: 1 })).to.be.revertedWithCustomError(Lock, "InvalidUnlockTime");
+      const lock = (await Lock.deploy()) as Lock;
+
+      await expect(lock.initialize(latestTime)).to.be.revertedWith("InvalidUnlockTime");
     });
 
     it("Should set the right unlockTime", async function () {
@@ -58,7 +60,7 @@ describe("Lock", function () {
 
     describe("Validations", function () {
       it("Should revert with the right error if called too soon", async function () {
-        await expect(this.lock.withdraw()).to.be.revertedWithCustomError(this.lock, "UnlockTimeNotReached");
+        await expect(this.lock.withdraw()).to.be.revertedWith("UnlockTimeNotReached");
       });
 
       it("Should revert with the right error if called from another account", async function () {
@@ -66,8 +68,7 @@ describe("Lock", function () {
         await time.increaseTo(this.unlockTime);
 
         // We use lock.connect() to send a transaction from another account
-        await expect(this.lock.connect(this.otherAccount).withdraw()).to.be.revertedWithCustomError(
-          this.lock,
+        await expect(this.lock.connect(this.otherAccount).withdraw()).to.be.revertedWith(
           "NotOwner",
         );
       });

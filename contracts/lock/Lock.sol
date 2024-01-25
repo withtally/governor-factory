@@ -14,6 +14,7 @@ contract Lock is Initializable {
 
     event Withdrawal(uint256 amount, uint256 when);
     event DepositReceived(address from, uint256 amount);
+    
 
     /**
      * @dev Initializes the Lock contract
