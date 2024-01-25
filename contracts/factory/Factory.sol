@@ -74,4 +74,28 @@ abstract contract Factory is AccessControl, Initializable, ReentrancyGuard {
         this.init(clone, initData);
         return clone;
     }
+
+    /// @notice Predicts the address of a clone created with a specific implementation and salt
+    /// @param implementation The address of the implementation contract to be cloned
+    /// @param salt The salt value to be used in the deterministic cloning process
+    /// @return The predicted address of the new clone contract
+    /// @dev Utilizes the keccak256 hash of the concatenation of a prefix, the factory contract address, salt, and the implementation bytecode for prediction
+    function predictCloneAddress(address implementation, bytes32 salt) public view returns (address) {
+        bytes memory bytecode = abi.encodePacked(
+            type(Clones).creationCode,
+            abi.encode(implementation)
+        );
+
+        bytes32 hash = keccak256(
+            abi.encodePacked(
+                bytes1(0xff),
+                address(this),
+                salt,
+                keccak256(bytecode)
+            )
+        );
+
+        return address(uint160(uint256(hash)));
+    }
+
 }
