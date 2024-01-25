@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "./Factory.sol";
+import "../Factory.sol";
 
 contract MockFactory is Factory {
     // This mock contract can have additional functions or state variables
