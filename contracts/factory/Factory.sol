@@ -23,7 +23,7 @@ abstract contract Factory is AccessControl, Initializable, ReentrancyGuard {
     /// @notice Initializes the contract with the given implementation address
     /// @param _implementation The address of the implementation contract
     /// @dev Sets up roles and sets the implementation address
-    function initialize(address _implementation) public initializer {
+    function initialize(address _implementation) public virtual initializer {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(UPDATER_ROLE, msg.sender);
         _setImplementation(_implementation);
@@ -50,9 +50,9 @@ abstract contract Factory is AccessControl, Initializable, ReentrancyGuard {
     /// @return The address of the newly created clone
     /// @dev Uses OpenZeppelin's Clones library
     function clone(bytes32 salt) public returns (address) {
-        address clone = Clones.cloneDeterministic(implementation, salt);
-        emit CloneCreated(clone);
-        return clone;
+        address _clone = Clones.cloneDeterministic(implementation, salt);
+        emit CloneCreated(_clone);
+        return _clone;
     }
 
     /// @notice Initializes a cloned contract with provided data
@@ -70,17 +70,16 @@ abstract contract Factory is AccessControl, Initializable, ReentrancyGuard {
     /// @return The address of the newly created and initialized clone
     /// @dev Combines the clone and init functions for convenience
     function cloneAndInitialize(bytes32 salt, bytes calldata initData) public returns (address) {
-        address clone = this.clone(salt);
-        this.init(clone, initData);
-        return clone;
+        address _clone = this.clone(salt);
+        this.init(_clone, initData);
+        return _clone;
     }
 
     /// @notice Predicts the address of a clone created with a specific implementation and salt
-    /// @param implementation The address of the implementation contract to be cloned
     /// @param salt The salt value to be used in the deterministic cloning process
     /// @return The predicted address of the new clone contract
     /// @dev Utilizes the keccak256 hash of the concatenation of a prefix, the factory contract address, salt, and the implementation bytecode for prediction
-    function predictCloneAddress(address implementation, bytes32 salt) public view returns (address) {
+    function predictCloneAddress(bytes32 salt) public view returns (address) {
         bytes memory bytecode = abi.encodePacked(
             type(Clones).creationCode,
             abi.encode(implementation)

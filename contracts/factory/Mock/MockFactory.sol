@@ -3,11 +3,16 @@ pragma solidity ^0.8.20;
 
 import "../Factory.sol";
 
+/// @title MockFactory
+/// @notice A mock implementation of the Factory contract
 contract MockFactory is Factory {
-    // This mock contract can have additional functions or state variables
-    // necessary for testing, such as counters or flags to validate behavior.
+    string public MOCK_NAME;
 
-    function testFunction() public pure returns (string memory) {
-        return "Mock Function Called";
+    /// @dev Initializes the MockFactory contract
+    /// @param _name The name of the mock factory
+    /// @param _implementation The address of the implementation contract
+    function initialize(string calldata _name, address _implementation) public {
+        MOCK_NAME = _name;
+        super.initialize(_implementation);
     }
 }
