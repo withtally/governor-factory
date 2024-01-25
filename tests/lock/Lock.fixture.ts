@@ -14,9 +14,13 @@ export async function deployLockFixture() {
   // Contracts are deployed using the first signer/account by default
   const [owner, otherAccount] = await ethers.getSigners();
 
-  const Lock = (await ethers.getContractFactory("Lock")) as Lock__factory;
-  const lock = (await Lock.deploy(unlockTime, { value: lockedAmount })) as Lock;
-  const lock_address = await lock.getAddress();
+  const LockFactory = (await ethers.getContractFactory("Lock", owner)) as Lock__factory;
+  const lock = (await LockFactory.deploy()) as Lock;
+
+  // Initialize the deployed Lock contract
+  await lock.initialize(unlockTime, { value: lockedAmount });
+
+  const lock_address = await lock.getAddress();  // Use .address to get the contract address
 
   return { lock, lock_address, unlockTime, lockedAmount, owner, otherAccount };
 }
