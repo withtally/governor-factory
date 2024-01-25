@@ -21,7 +21,7 @@ const deployContracts: DeployFunction = async function (hre: HardhatRuntimeEnvir
         console.log(`\nLock contract deployed at: `, lock.address);
 
         // Save to contracts.out file
-        const lockDeployStr = `Lock contract deployed at: ${lock.address} - Block number: ${lockBlock.number}\n`;
+        const lockDeployStr = `Lock contract deployed at: ${lock.address} - Block number: ${lockBlock?.number}\n`;
         fs.appendFileSync("contracts.out", lockDeployStr);
 
         // Verify Lock contract
@@ -43,7 +43,7 @@ const deployContracts: DeployFunction = async function (hre: HardhatRuntimeEnvir
         console.log(`\nMockFactory contract deployed at: `, mockFactory.address);
 
         // Save to contracts.out file
-        const mockFactoryDeployStr = `MockFactory contract deployed at: ${mockFactory.address} - Block number: ${mockFactoryBlock.number}\n`;
+        const mockFactoryDeployStr = `MockFactory contract deployed at: ${mockFactory.address} - Block number: ${mockFactoryBlock?.number}\n`;
         fs.appendFileSync("contracts.out", mockFactoryDeployStr);
 
         // Verify MockFactory contract
