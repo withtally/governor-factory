@@ -13,6 +13,7 @@ contract Lock is Initializable {
     address payable public owner;
 
     event Withdrawal(uint256 amount, uint256 when);
+    event DepositReceived(address from, uint256 amount);
 
     /**
      * @dev Initializes the Lock contract
@@ -20,9 +21,16 @@ contract Lock is Initializable {
      */
     function initialize(uint256 _unlockTime) public payable initializer {
         require(block.timestamp < _unlockTime, "InvalidUnlockTime");
-        
         unlockTime = _unlockTime;
         owner = payable(msg.sender);
+    }
+    
+    /**
+     * @dev Deposit funds into the contract.
+     */
+    function deposit() public payable {
+        require(block.timestamp < unlockTime, "Deposit window has passed");
+        emit DepositReceived(msg.sender, msg.value);
     }
 
     /**

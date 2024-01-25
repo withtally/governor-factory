@@ -18,9 +18,11 @@ export async function deployLockFixture() {
   const lock = (await LockFactory.deploy()) as Lock;
 
   // Initialize the deployed Lock contract
-  await lock.initialize(unlockTime, { value: lockedAmount });
+  await lock.initialize(unlockTime);
 
   const lock_address = await lock.getAddress();  // Use .address to get the contract address
+
+  await lock.deposit({ value: lockedAmount });
 
   return { lock, lock_address, unlockTime, lockedAmount, owner, otherAccount };
 }

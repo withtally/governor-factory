@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
 import type { MockFactory } from "../../types/contracts/factory/mock/MockFactory";
-import type { MockFactory__factory } from "../../types/factories/Factory__factory";
+import type { MockFactory__factory } from "../../types/factories/contracts/factory/mock/MockFactory__factory";
 
 export async function deployMockFactoryFixture() {
 
