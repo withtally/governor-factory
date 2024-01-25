@@ -1,10 +1,10 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { deployFactoryFixture } from "./MockFactoryFixture";
+import { deployMockFactoryFixture } from "./Factory.fixture";
 
 describe("Factory Contract", function () {
     beforeEach(async function () {
-        const { factory, deployer, implementationAddress } = await deployFactoryFixture();
+        const { factory, deployer, implementationAddress } = await deployMockFactoryFixture();
         this.factory = factory;
         this.deployer = deployer;
         this.implementationAddress = implementationAddress;
