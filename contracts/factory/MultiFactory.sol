@@ -25,7 +25,8 @@ contract MultiFactory is AccessControl, Initializable {
     /// @notice Initializes the contract
     /// @dev Sets up the DEFAULT_ADMIN_ROLE
     function initialize() public initializer {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(UPDATER_ROLE, msg.sender);
     }
 
     /// @notice Updates the address of a specific implementation
