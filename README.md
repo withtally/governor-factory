@@ -4,11 +4,11 @@ This package provides a factory contract for creating clones of a given implemen
 
 ## Factory Contract
 
-The factory contract is responsible for creating clones of a given implementation contract. It extends the
-`AccessControl`, `Initializable`, and `ReentrancyGuard` contracts from OpenZeppelin. The factory contract allows for the
-storage and update of the implementation address, cloning of the implementation contract using a deterministic address,
-initialization of the cloned contract with provided data, and prediction of the address of a clone created with a
-specific implementation and salt.
+The factory contract is responsible for creating clones of a given implementation contract.
+
+The factory contract allows for the storage and update of the implementation address, cloning of the implementation
+contract using a deterministic address, initialization of the cloned contract with provided data, and prediction of the
+address of a clone created with a specific implementation and salt.
 
 ## Usage
 
