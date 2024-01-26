@@ -8,7 +8,14 @@ export async function deployMockFactoryFixture() {
     const [deployer] = await ethers.getSigners();
 
     const Factory = (await ethers.getContractFactory("MockFactory")) as MockFactory__factory;
-    const factory = (await Factory.deploy()) as MockFactory;
+    const factory = await Factory.deploy() as MockFactory;
 
-    return { factory, deployer };
+    // set roles
+    await factory["initialize(address)"](deployer.address);
+    
+    const implementationAddress = await factory.getAddress(); // Replace with implementation address
+
+    await factory.updateImplementation(implementationAddress);
+
+    return { factory, deployer, implementationAddress };
 }

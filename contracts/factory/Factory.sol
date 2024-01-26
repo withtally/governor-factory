@@ -14,11 +14,15 @@ abstract contract Factory is AccessControl, Initializable, ReentrancyGuard {
     /// Address of the implementation contract
     address public implementation;
 
+    /// Errors
+    error InvalidImplementationAddress();
+    error InitializationFailed();
+
     /// Emitted when a new implementation address is stored
     event ImplementationStored(address indexed implementation);
 
     /// Emitted when a new clone is created
-    event CloneCreated(address indexed cloneAddress);
+    event CloneCreated(address indexed cloneAddress, address indexed implementation, bytes32 indexed salt);
 
     /// @notice Initializes the contract with the given implementation address
     /// @param _implementation The address of the implementation contract
@@ -40,7 +44,8 @@ abstract contract Factory is AccessControl, Initializable, ReentrancyGuard {
     /// @param newImplementation The address of the new implementation contract
     /// @dev Validates the new address and updates state; emits ImplementationStored event
     function _setImplementation(address newImplementation) internal {
-        require(newImplementation != address(0), "Invalid implementation address");
+        if (newImplementation == address(0)) revert InvalidImplementationAddress();
+
         implementation = newImplementation;
         emit ImplementationStored(newImplementation);
     }
@@ -51,7 +56,7 @@ abstract contract Factory is AccessControl, Initializable, ReentrancyGuard {
     /// @dev Uses OpenZeppelin's Clones library
     function clone(bytes32 salt) public returns (address) {
         address _clone = Clones.cloneDeterministic(implementation, salt);
-        emit CloneCreated(_clone);
+        emit CloneCreated(_clone, implementation, salt);
         return _clone;
     }
 
@@ -61,7 +66,8 @@ abstract contract Factory is AccessControl, Initializable, ReentrancyGuard {
     /// @dev Calls the cloned contract with provided data; requires success
     function init(address cloneAddress, bytes calldata initData) public {
         (bool success, ) = cloneAddress.call(initData);
-        require(success, "Initialization failed");
+
+        if (!success) revert InitializationFailed();
     }
 
     /// @notice Clones and initializes a new contract in one transaction
@@ -80,21 +86,10 @@ abstract contract Factory is AccessControl, Initializable, ReentrancyGuard {
     /// @return The predicted address of the new clone contract
     /// @dev Utilizes the keccak256 hash of the concatenation of a prefix, the factory contract address, salt, and the implementation bytecode for prediction
     function predictCloneAddress(bytes32 salt) public view returns (address) {
-        bytes memory bytecode = abi.encodePacked(
-            type(Clones).creationCode,
-            abi.encode(implementation)
-        );
+        bytes memory bytecode = abi.encodePacked(type(Clones).creationCode, abi.encode(implementation));
 
-        bytes32 hash = keccak256(
-            abi.encodePacked(
-                bytes1(0xff),
-                address(this),
-                salt,
-                keccak256(bytecode)
-            )
-        );
+        bytes32 hash = keccak256(abi.encodePacked(bytes1(0xff), address(this), salt, keccak256(bytecode)));
 
         return address(uint160(uint256(hash)));
     }
-
 }

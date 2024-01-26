@@ -22,7 +22,7 @@ describe("Factory Contract", function () {
 
     describe("Implementation Update", function () {
         it("Should update the implementation address", async function () {
-            const newImplementationAddress = "0x..."; // Replace with new implementation address
+            const newImplementationAddress = this.deployer.address; // Replace with new implementation address
             await expect(this.factory.updateImplementation(newImplementationAddress))
                 .to.emit(this.factory, "ImplementationStored")
                 .withArgs(newImplementationAddress);
