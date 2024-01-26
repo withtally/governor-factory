@@ -27,7 +27,7 @@ abstract contract Factory is AccessControl, Initializable, ReentrancyGuard {
     /// @notice Initializes the contract with the given implementation address
     /// @param _implementation The address of the implementation contract
     /// @dev Sets up roles and sets the implementation address
-    function initialize(address _implementation) public virtual initializer {
+    constructor(address _implementation){
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(UPDATER_ROLE, msg.sender);
         _setImplementation(_implementation);

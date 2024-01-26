@@ -4,18 +4,16 @@ import type { MockFactory__factory } from "../../types/factories/contracts/facto
 
 export async function deployMockFactoryFixture() {
 
-    // Contracts are deployed using the first signer/account by default
-    const [deployer] = await ethers.getSigners();
+  // Contracts are deployed using the first signer/account by default
+  const [deployer] = await ethers.getSigners();
 
-    const Factory = (await ethers.getContractFactory("MockFactory")) as MockFactory__factory;
-    const factory = await Factory.deploy() as MockFactory;
+  const Factory = (await ethers.getContractFactory("MockFactory")) as MockFactory__factory;
+  const factory = await Factory.deploy("demoName", deployer.address) as MockFactory;
 
-    // set roles
-    await factory["initialize(address)"](deployer.address);
-    
-    const implementationAddress = await factory.getAddress(); // Replace with implementation address
 
-    await factory.updateImplementation(implementationAddress);
+  const implementationAddress = await factory.getAddress(); // Replace with implementation address
 
-    return { factory, deployer, implementationAddress };
+  await factory.updateImplementation(implementationAddress);
+
+  return { factory, deployer, implementationAddress };
 }

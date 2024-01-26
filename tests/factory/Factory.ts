@@ -1,5 +1,4 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
 import { deployMockFactoryFixture } from "./Factory.fixture";
 
 describe("Factory Contract", function () {

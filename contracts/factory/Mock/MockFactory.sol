@@ -11,8 +11,7 @@ contract MockFactory is Factory {
     /// @dev Initializes the MockFactory contract
     /// @param _name The name of the mock factory
     /// @param _implementation The address of the implementation contract
-    function initialize(string calldata _name, address _implementation) public {
+    constructor(string memory _name, address _implementation) Factory(_implementation) {
         MOCK_NAME = _name;
-        super.initialize(_implementation);
     }
 }
