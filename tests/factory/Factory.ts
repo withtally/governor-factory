@@ -1,33 +1,84 @@
 import { expect } from "chai";
+import { ethers } from "hardhat";
 import { deployMockFactoryFixture } from "./Factory.fixture";
+import type { MockFactory, MockToken } from "../../types";
 
-describe("Factory Contract", function () {
-    beforeEach(async function () {
-        const { factory, deployer, implementationAddress } = await deployMockFactoryFixture();
-        this.factory = factory;
-        this.deployer = deployer;
-        this.implementationAddress = implementationAddress;
+describe("MockFactory Contract", function () {
+  let factory: MockFactory;
+  let token: MockToken;
+  let implementationAddress: string;
+
+  beforeEach(async function () {
+    ({ factory, token, implementationAddress } = await deployMockFactoryFixture());
+  });
+
+  const fixedSalt = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
+
+  describe("Clone Creation", function () {
+    it("Should create a clone of the MockToken", async function () {
+      await expect(factory.clone(fixedSalt, implementationAddress)).to.emit(factory, "CloneCreated");
     });
 
-    describe("Deployment", function () {
-        it("Should set the right implementation address", async function () {
-            expect(await this.factory.implementation()).to.equal(this.implementationAddress);
-        });
+    it("Should emit Clone Created event with correct arguments", async function () {
+      const tx = await factory.clone(fixedSalt, implementationAddress);
+      const receipt = await tx.wait();
 
-        it("Should assign the deployer as the admin", async function () {
-            expect(await this.factory.hasRole(await this.factory.DEFAULT_ADMIN_ROLE(), this.deployer.address)).to.be.true;
-        });
+      const event = receipt?.logs?.[0];
+
+      expect(event?.args?.[1]).to.equal(implementationAddress);
+      expect(event?.args?.[2]).to.equal(fixedSalt);
+
+    })
+  });
+
+  describe("Clone Initialization", function () {
+    it("Should initialize the cloned MockToken", async function () {
+      const initData = token.interface.encodeFunctionData("initialize", ["ClonedToken", "CTK"]);
+      const tx = await factory.clone(fixedSalt, implementationAddress);
+      const receipt = await tx.wait();
+
+      const event = receipt?.logs?.[0];
+
+      const cloneAddress = event?.args?.[0];
+
+      await expect(factory.initClone(cloneAddress, initData))
+        .to.emit(factory, "CloneInitialized")
+        .withArgs(cloneAddress, initData);
+
+      const clonedToken = await ethers.getContractAt("MockToken", cloneAddress) as MockToken;
+      expect(await clonedToken.name()).to.equal("ClonedToken");
+      expect(await clonedToken.symbol()).to.equal("CTK");
     });
+  });
 
-    describe("Implementation Update", function () {
-        it("Should update the implementation address", async function () {
-            const newImplementationAddress = this.deployer.address; // Replace with new implementation address
-            await expect(this.factory.updateImplementation(newImplementationAddress))
-                .to.emit(this.factory, "ImplementationStored")
-                .withArgs(newImplementationAddress);
-            expect(await this.factory.implementation()).to.equal(newImplementationAddress);
-        });
+  describe("Clone and Initialize in One Step", function () {
+    it("Should clone and initialize the MockToken in one transaction", async function () {
+      const initData = token.interface.encodeFunctionData("initialize", ["OneStepToken", "OST"]);
+      const tx = await factory.cloneAndInitialize(fixedSalt, implementationAddress, initData);
+      const receipt = await tx.wait();
+
+      const event = receipt?.logs?.[0];
+
+      const cloneAddress = event?.args?.[0];
+
+      const clonedToken = await ethers.getContractAt("MockToken", cloneAddress) as MockToken;
+      expect(await clonedToken.name()).to.equal("OneStepToken");
+      expect(await clonedToken.symbol()).to.equal("OST");
     });
+  });
 
-    // Add more test cases as needed...
+  describe("Predict Clone Address", function () {
+    it("Should predict the address of a clone correctly", async function () {
+      const predictedAddress = await factory.predictCloneAddress(fixedSalt, implementationAddress);
+      const tx = await factory.clone(fixedSalt, implementationAddress);
+      const receipt = await tx.wait();
+
+      const event = receipt?.logs?.[0];
+
+      const cloneAddress = event?.args?.[0];
+
+      expect(predictedAddress).to.equal(cloneAddress);
+    });
+  });
+
 });
