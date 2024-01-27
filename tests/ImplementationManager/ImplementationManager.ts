@@ -122,7 +122,20 @@ describe("ImplementationManager Contract", function () {
         .to.be.revertedWithCustomError(implementationManager, "NotAuthorized");
     });
 
-    // Similar tests for adding implementations
+    it("Should only allow UPDATER_ROLE to add an implementation", async function () {
+      const [_, otherAccount] = await ethers.getSigners();
+
+      const typeName = "TestType";
+      const version = 1;
+      const commitHash = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
+
+      // First, add the contract type with the deployer (who has UPDATER_ROLE)
+      await implementationManager.addContractType(typeName);
+
+      // Attempt to add an implementation with a different account
+      await expect(implementationManager.connect(otherAccount).addImplementation(typeName, deployer.address, version, commitHash))
+        .to.be.revertedWithCustomError(implementationManager, "NotAuthorized");
+    });
   });
 
   describe("Boundary Conditions", function () {
