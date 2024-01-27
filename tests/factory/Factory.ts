@@ -2,16 +2,14 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { deployMockFactoryFixture } from "./Factory.fixture";
 import type { MockFactory, MockToken } from "../../types";
-import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 
 describe("MockFactory Contract", function () {
   let factory: MockFactory;
   let token: MockToken;
-  let deployer: SignerWithAddress;
   let implementationAddress: string;
 
   beforeEach(async function () {
-    ({ factory, token, deployer, implementationAddress } = await deployMockFactoryFixture());
+    ({ factory, token, implementationAddress } = await deployMockFactoryFixture());
   });
 
   const fixedSalt = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
@@ -69,7 +67,7 @@ describe("MockFactory Contract", function () {
     });
   });
 
-  describe.only("Predict Clone Address", function () {
+  describe("Predict Clone Address", function () {
     it("Should predict the address of a clone correctly", async function () {
       const predictedAddress = await factory.predictCloneAddress(fixedSalt, implementationAddress);
       const tx = await factory.clone(fixedSalt, implementationAddress);

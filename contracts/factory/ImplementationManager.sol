@@ -17,7 +17,20 @@ contract ImplementationManager is AccessControl, Factory {
     error TypeDoesNotExist();
     error NotAuthorized();
     error VersionExists();
+    error VersionDoesNotExist();
     error CommitExists();
+    error InvalidTypeName();
+    error InvalidAddress();
+    error NoImplementations();
+
+    // EVents
+    event ContractTypeAdded(bytes32 indexed typeHash);
+    event ImplementationAdded(
+        bytes32 indexed typeHash,
+        address indexed implementation,
+        uint16 indexed version,
+        bytes32 commitHash
+    );
 
     struct Implementation {
         address implementation;
@@ -52,10 +65,14 @@ contract ImplementationManager is AccessControl, Factory {
     }
 
     function addContractType(string memory typeName) external onlyUpdater {
+        if (bytes(typeName).length == 0) revert InvalidTypeName();
+
         bytes32 typeHash = getTypeHash(typeName);
-        if (contractTypes[typeHash].typeHash == bytes32(0)) revert TypeAlreadyExists();
+        if (contractTypes[typeHash].typeHash != bytes32(0)) revert TypeAlreadyExists();
 
         contractTypes[typeHash] = ContractType(typeHash, 0);
+
+        emit ContractTypeAdded(typeHash);
     }
 
     function addImplementation(
@@ -70,6 +87,7 @@ contract ImplementationManager is AccessControl, Factory {
         if (contractType.typeHash == bytes32(0)) revert TypeDoesNotExist();
         if (versions[typeHash][version]) revert VersionExists();
         if (commits[typeHash][commitHash]) revert CommitExists();
+        if (implementation == address(0)) revert InvalidAddress();
 
         implementations[typeHash].push(Implementation(implementation, version, commitHash));
         contractType.latestVersion = version;
@@ -77,11 +95,17 @@ contract ImplementationManager is AccessControl, Factory {
         // Marking the version and commit hash as used for this contract type
         versions[typeHash][version] = true;
         commits[typeHash][commitHash] = true;
+
+        emit ImplementationAdded(typeHash, implementation, version, commitHash);
     }
 
     function getLatestImplementation(string memory typeName) external view returns (address, uint16, bytes32) {
         bytes32 typeHash = getTypeHash(typeName);
         Implementation[] storage impls = implementations[typeHash];
+
+        if (contractTypes[typeHash].typeHash == bytes32(0)) revert TypeDoesNotExist();
+        if (impls.length == 0) revert NoImplementations();
+
         uint256 latestIndex = impls.length - 1;
         return (impls[latestIndex].implementation, impls[latestIndex].version, impls[latestIndex].commitHash);
     }
@@ -96,6 +120,6 @@ contract ImplementationManager is AccessControl, Factory {
             }
         }
 
-        revert TypeDoesNotExist(); // No matching implementation found for the given version
+        revert VersionDoesNotExist(); // No matching implementation found for the given version
     }
 }
