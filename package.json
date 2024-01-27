@@ -1,6 +1,6 @@
 {
-  "name": "@tallyxyz/governor-factory",
-  "description": "Hardhat-based template for developing Solidity smart contracts",
+  "name": "@tallyxyz/tally-factory",
+  "description": "A package that contains the logic that handles Tally Factory contract.",
   "version": "1.0.0",
   "author": {
     "name": "Arthur F. Abeilice"
