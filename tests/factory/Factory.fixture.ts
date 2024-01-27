@@ -1,19 +1,24 @@
 import { ethers } from "hardhat";
-import type { MockFactory } from "../../types/contracts/factory/mock/MockFactory";
-import type { MockFactory__factory } from "../../types/factories/contracts/factory/mock/MockFactory__factory";
+import type { MockFactory, MockToken } from "../../types";
+import type { MockFactory__factory, MockToken__factory } from "../../types";
 
 export async function deployMockFactoryFixture() {
 
   // Contracts are deployed using the first signer/account by default
   const [deployer] = await ethers.getSigners();
 
-  const Factory = (await ethers.getContractFactory("MockFactory")) as MockFactory__factory;
-  const factory = await Factory.deploy("demoName", deployer.address) as MockFactory;
+  // Deploy the MockFactory
+  const Factory = (await ethers.getContractFactory("MockFactory", deployer)) as MockFactory__factory;
+  const factory = await Factory.deploy() as MockFactory;
 
+  // Deploy the MockToken
+  const Token = (await ethers.getContractFactory("MockToken", deployer)) as MockToken__factory;
+  const token = await Token.deploy() as MockToken;
 
-  const implementationAddress = await factory.getAddress(); // Replace with implementation address
+  // Initialize the MockToken with desired parameters
+  await token.initialize("MockToken", "MTK");
 
-  await factory.updateImplementation(implementationAddress);
+  const implementationAddress = await token.getAddress();
 
-  return { factory, deployer, implementationAddress };
+  return { factory, token, deployer, implementationAddress };
 }
