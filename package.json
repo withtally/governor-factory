@@ -1,6 +1,6 @@
 {
   "name": "@tallyxyz/tally-factory",
-  "description": "A package that contains the logic that handles Tally Factory contract.",
+  "description": "A package that contains the logic that handles Tally Factory and Implementations Manager contracts.",
   "version": "1.0.0",
   "author": {
     "name": "Arthur F. Abeilice"
