@@ -4,15 +4,16 @@ import fs from "fs";
 
 const deployContracts: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deploy } = hre.deployments;
-    const { deployer } = await hre.getNamedAccounts();
+    const [deployerSigner] = await hre.ethers.getSigners();
+    const deployer = await deployerSigner.getAddress();
 
     console.log("\x1B[37mDeploying MockToken contract");
 
     // Deploy MockToken contract
     await (async function deployMockToken() {
+
         const mockToken = await deploy("MockToken", {
             from: deployer,
-            args: [], // MockToken constructor arguments
             log: true,
         });
 

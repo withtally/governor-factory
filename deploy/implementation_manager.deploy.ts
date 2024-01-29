@@ -4,7 +4,8 @@ import fs from "fs";
 
 const deployContracts: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deploy } = hre.deployments;
-    const { deployer } = await hre.getNamedAccounts();
+    const [deployerSigner] = await hre.ethers.getSigners();
+    const deployer = await deployerSigner.getAddress();
 
     console.log("\x1B[37mDeploying ImplementationManager and MockToken contracts");
 

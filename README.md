@@ -22,6 +22,21 @@ To use the Tally Factory, follow these steps:
    import "@tallyxyz/tally-factory/contracts/factory/Factory.sol";
    ```
 
+## Deploy
+
+To deploy it you have to run the following:
+
+```bash
+# run all deploy scripts in the deploy folder
+npx hardhat deploy
+# just implementation manager
+npx hardhat deploy --tags ImplementationManager
+# just MockToken
+npx hardhat deploy --tags MockToken
+# just MockFactory
+npx hardhat deploy --tags MockFactory
+```
+
 <!-- ## Contributing
 
 Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a
