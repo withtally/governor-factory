@@ -7,8 +7,10 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import "./Factory.sol";
 
-/// @title Factory Contract for creating clones of a given implementation
-/// @dev Extends AccessControl, Initializable, and ReentrancyGuard from OpenZeppelin
+/// @title Implementation Manager Contract
+/// @notice This contract is responsible for managing the creation and tracking of contract implementations.
+/// It allows for the addition of contract types and their corresponding implementations.
+/// @dev This contract extends AccessControl, Initializable, and ReentrancyGuard from OpenZeppelin.
 contract ImplementationManager is AccessControl, Factory {
     bytes32 public constant UPDATER_ROLE = keccak256("UPDATER_ROLE");
 
@@ -23,7 +25,7 @@ contract ImplementationManager is AccessControl, Factory {
     error InvalidAddress();
     error NoImplementations();
 
-    // EVents
+    // Events
     event ContractTypeAdded(bytes32 indexed typeHash);
     event ImplementationAdded(
         bytes32 indexed typeHash,
@@ -46,7 +48,7 @@ contract ImplementationManager is AccessControl, Factory {
     mapping(bytes32 => ContractType) public contractTypes;
     mapping(bytes32 => Implementation[]) public implementations;
 
-    //track versions and committs for no clashes
+    // Track versions and commits to avoid clashes
     mapping(bytes32 => mapping(uint16 => bool)) public versions;
     mapping(bytes32 => mapping(bytes32 => bool)) public commits;
 
@@ -60,10 +62,15 @@ contract ImplementationManager is AccessControl, Factory {
         _;
     }
 
+    /// @notice Generates the type hash for a given contract type name.
+    /// @param typeName The name of the contract type.
+    /// @return The type hash.
     function getTypeHash(string memory typeName) public pure returns (bytes32) {
         return keccak256(abi.encode(typeName));
     }
 
+    /// @notice Adds a new contract type.
+    /// @param typeName The name of the contract type to add.
     function addContractType(string memory typeName) external onlyUpdater {
         if (bytes(typeName).length == 0) revert InvalidTypeName();
 
@@ -75,6 +82,11 @@ contract ImplementationManager is AccessControl, Factory {
         emit ContractTypeAdded(typeHash);
     }
 
+    /// @notice Adds a new implementation for a contract type.
+    /// @param typeName The name of the contract type.
+    /// @param implementation The address of the implementation contract.
+    /// @param version The version number of the implementation.
+    /// @param commitHash The commit hash associated with the implementation.
     function addImplementation(
         string memory typeName,
         address implementation,
@@ -99,6 +111,9 @@ contract ImplementationManager is AccessControl, Factory {
         emit ImplementationAdded(typeHash, implementation, version, commitHash);
     }
 
+    /// @notice Retrieves the latest implementation for a contract type.
+    /// @param typeName The name of the contract type.
+    /// @return The address, version, and commit hash of the latest implementation.
     function getLatestImplementation(string memory typeName) external view returns (address, uint16, bytes32) {
         bytes32 typeHash = getTypeHash(typeName);
         Implementation[] storage impls = implementations[typeHash];
@@ -110,6 +125,10 @@ contract ImplementationManager is AccessControl, Factory {
         return (impls[latestIndex].implementation, impls[latestIndex].version, impls[latestIndex].commitHash);
     }
 
+    /// @notice Retrieves the implementation for a specific version of a contract type.
+    /// @param typeName The name of the contract type.
+    /// @param version The version number of the implementation.
+    /// @return The address of the implementation.
     function getImplementationByVersion(string memory typeName, uint16 version) external view returns (address) {
         bytes32 typeHash = getTypeHash(typeName);
         Implementation[] storage impls = implementations[typeHash];
