@@ -20,5 +20,5 @@ export async function deployMockFactoryFixture() {
 
   const implementationAddress = await token.getAddress();
 
-  return { factory, token, deployer, implementationAddress };
+  return { factory, token, implementationAddress, deployer };
 }
