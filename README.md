@@ -37,11 +37,10 @@ npx hardhat deploy --tags MockToken
 npx hardhat deploy --tags MockFactory
 ```
 
-<!-- ## Contributing
+### 🤝 Contributions
 
-Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a
-pull request on the [GitHub repository](https://github.com/your-username/tally-factory). -->
+Contributions are welcome! Refer to the [contributing guidelines](CONTRIBUTING.md) to get started.
 
 ## License
 
-This package is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+This package is licensed under the [MIT License](LICENSE.md).
